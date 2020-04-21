@@ -1,4 +1,5 @@
 import React from 'react';
+import LeafletMap from './LeafletMap'
 
 const background = {
   backgroundColor: 'black',
@@ -6,9 +7,10 @@ const background = {
   minHeight: '100vh'
 }
 
-function App() {
+const App = () => {
   return (
     <div style={background}>
+      <LeafletMap/>
     </div>
   );
 }
