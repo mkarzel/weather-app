@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet'
-import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
+import { Map, TileLayer, Marker } from 'react-leaflet'
 
 const map = {
   height: '60vh',
@@ -18,51 +18,36 @@ L.Icon.Default.mergeOptions({
 
 class LeafletMap extends Component {
 
-  // state = {
-  //   lat: 52.2277,
-  //   lng: 19.3579,
-  //   zoom: 5,
-  // }
-
   constructor() {
     super();
     this.state = {
       lat: 53.4327,
       lng: 14.5481,
       zoom: 9,
-      markers: [[53.4327, 14.5481]],
+      marker: [[53.4327, 14.5481]],
     };
   }
 
   addMarker = (e) => {
-    const { markers } = this.state
-    markers.pop();
-    markers.push(e.latlng)
-    this.setState({ markers })
+    const { marker } = this.state
+    marker.pop();
+    marker.push(e.latlng)
+    this.setState({ marker })
 
     const { lat, lng } = e.latlng
-    console.log(`Clicked at ${lat}, ${lng}`)
+    console.log(`marker coords: ${lat} ${lng}`)
   }
 
-  // handleClick = event => {
-  //   const { lat, lng } = event.latlng
-  //   console.log(`Clicked at ${lat}, ${lng}`)
-  // }
-
   render() {
-    // const position = [this.state.lat, this.state.lng]
     return (
       <Map style={map} center={[this.state.lat, this.state.lng]} zoom={this.state.zoom} onClick={this.addMarker}>
         <TileLayer
           attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {this.state.markers.map((position, idx) =>
-          <Marker key={`marker-${idx}`} position={position}>
-          {/* <Popup>
-            <span>A pretty CSS3 popup. <br/> Easily customizable.</span>
-          </Popup> */}
-        </Marker>
+        {this.state.marker.map((position, index) =>
+          <Marker key={`marker-${index}`} position={position}>
+          </Marker>
         )}
       </Map>
     )
