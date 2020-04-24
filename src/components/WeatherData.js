@@ -13,30 +13,23 @@ const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${ln
 
 const WeatherData = () => {
 
-    const [temperature, setTemperature] = useState('')
-    const [pressure, setPressure] = useState('')
-    const [humidity, setHumidity] = useState('')
-    const [data, setData] = useState('')
+    const [current, setCurrent] = useState('')
+    const [forecast, setForecast] = useState('')
     useEffect(() => {
         (async () => {
             const response = await axios.get(url);
-            setTemperature(response.data.current.temp)
-            setPressure(response.data.current.pressure)
-            setHumidity(response.data.current.humidity)
-            // setData(response.data)
-            // console.log(response)
+            setCurrent(response.data.current)
+            setForecast(response.data.daily)
         })();
     }, []);
-    // console.log(response)
-    // setData(response.data)
-    console.log(data)
+    // console.log(forecast)
     return (
         <div style={container}>
-            <div>temperature: {temperature} C</div>
-            <div>pressure: {pressure} hPa</div>
-            <div>humidity: {humidity} %</div>
+            <div>temperature: {current.temp} C</div>
+            <div>pressure: {forecast.pressure} hPa</div>
+            <div>humidity: {current.humidity} %</div>
         </div>
-    );
+    ); 
 
 }
 
