@@ -24,6 +24,18 @@ const iconSize = {
     width: '4vw'
 }
 
+const date = {
+    fontSize: '2vw',
+    color: 'yellow',
+    textAlign: 'center'
+}
+
+const timestampToDate = (unixTimestamp) => {
+    const milliseconds = unixTimestamp * 1000   
+    const dateObject = new Date(milliseconds)   
+    return dateObject.toLocaleString() 
+}
+
 const key = `4c5fbd2fe1afe8b0cd155b79c2de7ef8`
 let lat = 53.4327
 let lng = 14.5481
@@ -40,27 +52,35 @@ const WeatherData = () => {
         })();
     }, []);
     console.log(data)
+
     return (
         <div>
-            {data && (<div style={mainContainer}>
-                <div style={measurementContainer}>
-                    <img style={iconSize} alt={`weather icon`} src={`http://openweathermap.org/img/w/${data.current.weather[0].icon}.png`} />
-                    <span style={measurementText}>{data.current.temp} &#8451;</span>
+            {data &&
+                (<div>
+                    <div style={mainContainer}>
+                        <div style={measurementContainer}>
+                            <img style={iconSize} alt={`weather icon`} src={`http://openweathermap.org/img/w/${data.current.weather[0].icon}.png`} />
+                            <span style={measurementText}>{data.current.temp} &#8451;</span>
+                        </div>
+                        <div style={measurementContainer}>
+                            <img style={iconSize} alt={`pressure icon`} src={pressureIcon} />
+                            <span style={measurementText}>{data.current.pressure} hPa</span>
+                        </div>
+                        <div style={measurementContainer}>
+                            <img style={iconSize} alt={`humidity icon`} src={humidityIcon} />
+                            <span style={measurementText}>{data.current.humidity} %</span>
+                        </div>
+                        <div style={measurementContainer}>
+                            <img style={iconSize} alt={`wind speed icon`} src={windIcon} />
+                            <span style={measurementText}>{data.current.wind_speed} m/s</span>
+                        </div>
+                    </div>
+                    <div style={date}>
+                        <span>{timestampToDate(data.hourly[0].dt)}</span>
+                    </div>
                 </div>
-                <div style={measurementContainer}>
-                    <img style={iconSize} alt={`pressure icon`} src={pressureIcon} />
-                    <span style={measurementText}>{data.current.pressure} hPa</span>
-                </div>
-                <div style={measurementContainer}>
-                    <img style={iconSize} alt={`humidity icon`} src={humidityIcon} />
-                    <span style={measurementText}>{data.current.humidity} %</span>
-                </div>
-                <div style={measurementContainer}>
-                    <img style={iconSize} alt={`wind speed icon`} src={windIcon} />
-                    <span style={measurementText}>{data.current.wind_speed} m/s</span>
-                </div>
-            </div>
-            )}
+                )
+            }
         </div>
     );
 
