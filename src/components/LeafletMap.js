@@ -4,7 +4,7 @@ import L from 'leaflet'
 import { Map, TileLayer, Marker } from 'react-leaflet'
 
 const map = {
-  height: '60vh',
+  height: '50vh',
   width: '100vw'
 }
 
