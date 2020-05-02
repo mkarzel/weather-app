@@ -136,7 +136,7 @@ const WeatherData = () => {
                         <img className={classes.forecastIconSize} alt={`wind speed icon`} src={windIcon} />
                         <span className={classes.forecastText}>{data.daily[i].wind_speed} m/s</span>
                     </div>
-                    <div>
+                    <div className={classes.forecastDay}>
                         <div className={classes.forecastDateText}>{timestampToDate(data.daily[i].dt, 'short')}</div>
                     </div>
                 </div>)
