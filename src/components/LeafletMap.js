@@ -4,7 +4,7 @@ import L from 'leaflet'
 import { Map, TileLayer, Marker } from 'react-leaflet'
 
 const map = {
-  height: '60vh',
+  height: '50vh',
   width: '100vw'
 }
 
@@ -40,7 +40,7 @@ class LeafletMap extends Component {
 
   render() {
     return (
-      <Map style={map} center={[this.state.lat, this.state.lng]} zoom={this.state.zoom} onClick={this.addMarker}>
+      <Map style={map} tap={false} center={[this.state.lat, this.state.lng]} zoom={this.state.zoom} onClick={this.addMarker}>
         <TileLayer
           attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
