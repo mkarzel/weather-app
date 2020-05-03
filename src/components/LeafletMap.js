@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet'
-import { Map, TileLayer, Marker } from 'react-leaflet'
+import L from 'leaflet';
+import { Map, TileLayer, Marker } from 'react-leaflet';
+import WeatherData from './WeatherData';
+
 
 const map = {
   height: '50vh',
@@ -21,10 +23,11 @@ class LeafletMap extends Component {
   constructor() {
     super();
     this.state = {
-      lat: 53.4327,
-      lng: 14.5481,
-      zoom: 9,
-      marker: [[53.4327, 14.5481]],
+      lat: 52.12776972930117,
+      lng: 18.984375000000004,
+      zoom: 5,
+      marker: [[]],
+      markerPlaced: false,
     };
   }
 
@@ -32,24 +35,20 @@ class LeafletMap extends Component {
     const { marker } = this.state
     marker.pop();
     marker.push(e.latlng)
-    this.setState({ marker })
-
-    const { lat, lng } = e.latlng
-    console.log(`marker coords: ${lat} ${lng}`)
+    this.setState({ marker, markerPlaced: true })
   }
 
   render() {
     return (
-      <Map style={map} tap={false} center={[this.state.lat, this.state.lng]} zoom={this.state.zoom} onClick={this.addMarker}>
-        <TileLayer
-          attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {this.state.marker.map((position, index) =>
-          <Marker key={`marker-${index}`} position={position}>
-          </Marker>
-        )}
-      </Map>
+      <div>
+        <Map style={map} worldCopyJump={false} tap={false} center={[this.state.lat, this.state.lng]} zoom={this.state.zoom} onClick={this.addMarker}>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {this.state.markerPlaced && this.state.marker.map((position, index) =>
+            <Marker key={`marker-${index}`} position={position} />
+          )}
+        </Map>
+        <WeatherData coords={this.state.marker} />
+      </div>
     )
   }
 }
