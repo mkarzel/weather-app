@@ -10,7 +10,7 @@ const useStyles = makeStyles({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-evenly',
-        height: '50vh',
+        minHeight: '50vh',
     },
     currentDateText: {
         color: 'yellow',
@@ -63,11 +63,13 @@ const useStyles = makeStyles({
         }
     },
     forecastDateText: {
+        display: 'flex',
+        justifyContent: 'center',
         color: 'yellow',
-        textAlign: 'center',
         fontSize: '2vw',
         '@media screen and (max-width: 600px)': {
-            fontSize: '1.5vh'
+            fontSize: '1.5vh',
+            width: '20vw',
         }
     },
     forecastIconSize: {
@@ -95,34 +97,41 @@ const timestampToDate = (unixTimestamp, version) => {
         return dateObject.toLocaleString('pl-PL')
 }
 
-
-const key = `4c5fbd2fe1afe8b0cd155b79c2de7ef8`
-let lat = 53.4327
-let lng = 14.5481
-const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&units=metric&appid=${key}`
-
-const WeatherData = () => {
+const WeatherData = (props) => {
 
     const classes = useStyles()
+
+    let lat = props.coords[0].lat
+    let lng = props.coords[0].lng
+    const key = `4c5fbd2fe1afe8b0cd155b79c2de7ef8`
+    const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&units=metric&appid=${key}`
+
+    if (lng > 180) {
+        lng = lng % 180
+    }
+    if (lng < -180) {
+        lng = 180 + (lng % 180)
+    }
 
     const [data, setData] = useState(null)
 
     useEffect(() => {
         (async () => {
-            const response = await axios.get(url);
-            setData(response.data)
+            if (lat && lng) {
+                const response = await axios.get(url);
+                setData(response.data)
+            }
         })();
-    }, []);
+    }, [lat, lng, url]);
 
     const forecast = []
-
     if (data) {
         for (let i = 1; i < data.daily.length; i++) {
             forecast.push(
                 <div className={classes.forecastMeasurementsContainer} key={i}>
                     <div className={classes.forecastDay}>
                         <img className={classes.forecastIconSize} alt={`weather icon`} src={`http://openweathermap.org/img/w/${data.daily[i].weather[0].icon}.png`} />
-                        <div className={classes.forecastText}>{data.daily[i].temp.day} &#8451;</div>
+                        <div className={classes.forecastText}>{data.daily[i].temp.day}&#8451;</div>
                     </div>
                     <div className={classes.forecastDay}>
                         <img className={classes.forecastIconSize} alt={`pressure icon`} src={pressureIcon} />
@@ -130,13 +139,13 @@ const WeatherData = () => {
                     </div>
                     <div className={classes.forecastDay}>
                         <img className={classes.forecastIconSize} alt={`humidity icon`} src={humidityIcon} />
-                        <span className={classes.forecastText}>{data.daily[i].humidity} %</span>
+                        <span className={classes.forecastText}>{data.daily[i].humidity}%</span>
                     </div>
                     <div className={classes.forecastDay}>
                         <img className={classes.forecastIconSize} alt={`wind speed icon`} src={windIcon} />
                         <span className={classes.forecastText}>{data.daily[i].wind_speed} m/s</span>
                     </div>
-                    <div className={classes.forecastDay}>
+                    <div>
                         <div className={classes.forecastDateText}>{timestampToDate(data.daily[i].dt, 'short')}</div>
                     </div>
                 </div>)
@@ -154,7 +163,7 @@ const WeatherData = () => {
                         <div className={classes.currentMeasurementsContainer}>
                             <div className={classes.currentMeasurementContainer}>
                                 <img className={classes.currentIconSize} alt={`weather icon`} src={`http://openweathermap.org/img/w/${data.current.weather[0].icon}.png`} />
-                                <span className={classes.currentMeasurementText}>{data.current.temp} &#8451;</span>
+                                <span className={classes.currentMeasurementText}>{data.current.temp}&#8451;</span>
                             </div>
                             <div className={classes.currentMeasurementContainer}>
                                 <img className={classes.currentIconSize} alt={`pressure icon`} src={pressureIcon} />
@@ -162,7 +171,7 @@ const WeatherData = () => {
                             </div>
                             <div className={classes.currentMeasurementContainer}>
                                 <img className={classes.currentIconSize} alt={`humidity icon`} src={humidityIcon} />
-                                <span className={classes.currentMeasurementText}>{data.current.humidity} %</span>
+                                <span className={classes.currentMeasurementText}>{data.current.humidity}%</span>
                             </div>
                             <div className={classes.currentMeasurementContainer}>
                                 <img className={classes.currentIconSize} alt={`wind speed icon`} src={windIcon} />
