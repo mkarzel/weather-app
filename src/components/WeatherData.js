@@ -85,6 +85,11 @@ const useStyles = makeStyles({
             justifyContent: 'center',
             width: '20vw',
         }
+    },
+    infoText: {
+        fontSize: '3vw',
+        color: 'yellow',
+        textAlign: 'center',
     }
 });
 
@@ -131,7 +136,7 @@ const WeatherData = (props) => {
                 <div className={classes.forecastMeasurementsContainer} key={i}>
                     <div className={classes.forecastDay}>
                         <img className={classes.forecastIconSize} alt={`weather icon`} src={`http://openweathermap.org/img/w/${data.daily[i].weather[0].icon}.png`} />
-                        <div className={classes.forecastText}>{data.daily[i].temp.day}&#8451;</div>
+                        <span className={classes.forecastText}>{data.daily[i].temp.day}&#8451;</span>
                     </div>
                     <div className={classes.forecastDay}>
                         <img className={classes.forecastIconSize} alt={`pressure icon`} src={pressureIcon} />
@@ -154,6 +159,10 @@ const WeatherData = (props) => {
 
     return (
         <div>
+            {!data && (
+                <div className={classes.infoText}>Mark a place on the map to check the weather</div>
+            )
+            }
             {data &&
                 (<div className={classes.mainContainer}>
                     <div>
