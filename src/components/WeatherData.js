@@ -109,20 +109,31 @@ const WeatherData = (props) => {
     let lat = props.coords[0].lat
     let lng = props.coords[0].lng
     const key = `4c5fbd2fe1afe8b0cd155b79c2de7ef8`
-    const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&units=metric&appid=${key}`
 
     if (lng > 180) {
-        lng = lng % 180
+        if (lng % 180 !== lng % 360) {
+            lng = (lng % 180) - 180
+        }
+        if (lng % 180 === lng % 360){
+            lng = lng % 180
+        }
     }
     if (lng < -180) {
-        lng = 180 + (lng % 180)
+        if (lng % 180 !== lng % 360) {
+            lng = (lng % 180) + 180
+        }
+        if (lng % 180 === lng % 360) {
+            lng = lng % 180
+        }
     }
+
+    const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&units=metric&appid=${key}`
 
     const [data, setData] = useState(null)
 
     useEffect(() => {
         (async () => {
-            if (lat && lng) {
+            if (lat && lng > -180 && lng < 180) {
                 const response = await axios.get(url);
                 setData(response.data)
             }
