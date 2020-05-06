@@ -4,18 +4,17 @@ import L from 'leaflet';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import WeatherData from './WeatherData';
 
-
 const map = {
   height: '50vh',
-  width: '100vw'
-}
+  width: '100vw',
+};
 
 delete L.Icon.Default.prototype._getIconUrl;
 
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
   iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
 class LeafletMap extends Component {
@@ -32,10 +31,10 @@ class LeafletMap extends Component {
   }
 
   addMarker = (e) => {
-    const { marker } = this.state
+    const { marker } = this.state;
     marker.pop();
-    marker.push(e.latlng)
-    this.setState({ marker, markerPlaced: true })
+    marker.push(e.latlng);
+    this.setState({ marker, markerPlaced: true });
   }
 
   render() {
@@ -49,8 +48,8 @@ class LeafletMap extends Component {
         </Map>
         <WeatherData coords={this.state.marker} />
       </div>
-    )
+    );
   }
 }
 
-export default LeafletMap
+export default LeafletMap;

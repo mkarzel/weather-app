@@ -3,14 +3,20 @@ import axios from 'axios';
 import pressureIcon from '../images/atmospheric-pressure.png';
 import humidityIcon from '../images/humidity.png';
 import windIcon from '../images/wind-speed.png';
-import { makeStyles } from '@material-ui/styles'
+import { makeStyles } from '@material-ui/styles';
+import { CircularProgress } from '@material-ui/core';
 
 const useStyles = makeStyles({
+    weatherContainer: {
+        height: '50vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-evenly',
+    },
     current: {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-evenly',
-        minHeight: '50vh',
     },
     current__measurements: {
         display: 'flex',
@@ -27,33 +33,33 @@ const useStyles = makeStyles({
         fontSize: '2vw',
         '@media screen and (max-width: 600px)': {
             fontSize: '3vh',
-        }
+        },
     },
     current__text: {
         paddingLeft: '1vw',
         fontSize: '2vw',
         '@media screen and (max-width: 600px)': {
             fontSize: '2vh',
-        }
+        },
     },
     current__icon: {
         width: '3vw',
         '@media screen and (max-width: 600px)': {
             width: '3vh',
-        }
+        },
     },
     forecast: {
         display: 'flex',
         justifyContent: 'space-evenly',
         '@media screen and (max-width: 600px)': {
-            flexDirection: 'column'
-        }
+            flexDirection: 'column',
+        },
     },
     forecast__week: {
         '@media screen and (max-width: 600px)': {
             display: 'flex',
             justifyContent: 'space-evenly',
-        }
+        },
     },
     forecast__day: {
         display: 'flex',
@@ -61,7 +67,7 @@ const useStyles = makeStyles({
         '@media screen and (max-width: 600px)': {
             justifyContent: 'center',
             width: '20vw',
-        }
+        },
     },
     forecast__date: {
         display: 'flex',
@@ -71,76 +77,88 @@ const useStyles = makeStyles({
         '@media screen and (max-width: 600px)': {
             fontSize: '1.5vh',
             width: '20vw',
-        }
+        },
     },
     forecast__text: {
         paddingLeft: '0.5vw',
         fontSize: '1.5vw',
         '@media screen and (max-width: 600px)': {
-            fontSize: '1.5vh'
-        }
+            fontSize: '1.5vh',
+        },
     },
     forecast__icon: {
         width: '2vw',
         '@media screen and (max-width: 600px)': {
-            width: '2.5vh'
-        }
+            width: '2.5vh',
+        },
     },
     info__text: {
         fontSize: '3vw',
         color: 'yellow',
         textAlign: 'center',
-    }
+    },
+    loader: {
+        display: 'flex',
+        justifyContent: 'center',
+        height: '50vh',
+        alignItems: 'center',
+    },
 });
 
 const timestampToDate = (unixTimestamp, version) => {
-    const milliseconds = unixTimestamp * 1000
-    const dateObject = new Date(milliseconds)
-    if (version === 'short')
-        return dateObject.toLocaleString('pl-PL', { day: 'numeric', month: 'numeric' })
-    else
-        return dateObject.toLocaleString('pl-PL')
+    const milliseconds = unixTimestamp * 1000;
+    const dateObject = new Date(milliseconds);
+    if (version === 'short') {
+        return dateObject.toLocaleString('pl-PL', { day: 'numeric', month: 'numeric' });
+    }
+    else {
+        return dateObject.toLocaleString('pl-PL');
+    }
 }
 
 const WeatherData = (props) => {
 
-    const classes = useStyles()
+    const classes = useStyles();
 
-    let lat = props.coords[0].lat
-    let lng = props.coords[0].lng
-    const key = `4c5fbd2fe1afe8b0cd155b79c2de7ef8`
+    let lat = props.coords[0].lat;
+    let lng = props.coords[0].lng;
+    const key = `4c5fbd2fe1afe8b0cd155b79c2de7ef8`;
 
     if (lng > 180) {
         if (lng % 180 !== lng % 360) {
-            lng = (lng % 180) - 180
+            lng = (lng % 180) - 180;
         }
-        if (lng % 180 === lng % 360){
-            lng = lng % 180
+        if (lng % 180 === lng % 360) {
+            lng = lng % 180;
         }
     }
     if (lng < -180) {
         if (lng % 180 !== lng % 360) {
-            lng = (lng % 180) + 180
+            lng = (lng % 180) + 180;
         }
         if (lng % 180 === lng % 360) {
-            lng = lng % 180
+            lng = lng % 180;
         }
     }
 
-    const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&units=metric&appid=${key}`
+    const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&units=metric&appid=${key}`;
 
-    const [data, setData] = useState(null)
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         (async () => {
             if (lat && lng > -180 && lng < 180) {
+                setData(null);
+                setLoading(true);
                 const response = await axios.get(url);
-                setData(response.data)
+                setLoading(false);
+                setData(response.data);
             }
         })();
     }, [lat, lng, url]);
 
-    const forecast = []
+    const forecast = [];
     if (data) {
         for (let i = 1; i < data.daily.length; i++) {
             forecast.push(
@@ -170,13 +188,15 @@ const WeatherData = (props) => {
 
     return (
         <div>
-            {!data && (
+            {!data && !loading && (
                 <div className={classes.info__text}>Mark a place on the map to check the weather</div>
-            )
-            }
+            )}
+            {loading && (
+                <div className={classes.loader}><CircularProgress color={'inherit'} size={'10vh'} /></div>
+            )}
             {data &&
-                (<div className={classes.current}>
-                    <div>
+                (<div className={classes.weatherContainer}>
+                    <div className={classes.current}>
                         <div className={classes.current__date}>
                             <span>{timestampToDate(data.current.dt)}</span>
                         </div>
@@ -202,11 +222,10 @@ const WeatherData = (props) => {
                     <div className={classes.forecast}>
                         {forecast}
                     </div>
-                </div>
-                )
+                </div>)
             }
         </div>
     );
 }
 
-export default WeatherData
+export default WeatherData;
