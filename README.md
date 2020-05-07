@@ -1,3 +1,9 @@
+## Weather App
+
+This app allows you to check current weather and one week forecast for every place in the world. Mark a place on the map to get weather info.
+
+![preview](https://user-images.githubusercontent.com/26392270/81314702-b92ee900-9089-11ea-83fa-ed16a28cdecd.png)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
