@@ -1,11 +1,11 @@
 import React from 'react';
-import LeafletMap from './LeafletMap'
+import LeafletMap from './LeafletMap';
 
 const background = {
   backgroundColor: 'black',
   color: 'white',
   minHeight: '100vh',
-}
+};
 
 const App = () => {
   return (

@@ -3,66 +3,73 @@ import axios from 'axios';
 import pressureIcon from '../images/atmospheric-pressure.png';
 import humidityIcon from '../images/humidity.png';
 import windIcon from '../images/wind-speed.png';
-import { makeStyles } from '@material-ui/styles'
+import { makeStyles } from '@material-ui/styles';
+import { CircularProgress } from '@material-ui/core';
 
 const useStyles = makeStyles({
-    mainContainer: {
+    weatherContainer: {
+        height: '50vh',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-evenly',
-        minHeight: '50vh',
     },
-    currentDateText: {
+    current: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-evenly',
+    },
+    current__measurements: {
+        display: 'flex',
+        justifyContent: 'space-evenly',
+        paddingBottom: '2vw',
+    },
+    current__measurement: {
+        display: 'flex',
+        alignItems: 'center',
+    },
+    current__date: {
         color: 'yellow',
         textAlign: 'center',
         fontSize: '2vw',
         '@media screen and (max-width: 600px)': {
             fontSize: '3vh',
-        }
+        },
     },
-    currentMeasurementsContainer: {
-        display: 'flex',
-        justifyContent: 'space-evenly',
-        paddingBottom: '2vw',
-    },
-    currentMeasurementContainer: {
-        display: 'flex',
-        alignItems: 'center',
-    },
-    currentMeasurementText: {
+    current__text: {
         paddingLeft: '1vw',
         fontSize: '2vw',
         '@media screen and (max-width: 600px)': {
             fontSize: '2vh',
-        }
+        },
     },
-    currentIconSize: {
+    current__icon: {
         width: '3vw',
         '@media screen and (max-width: 600px)': {
             width: '3vh',
-        }
+        },
     },
-    forecastContainer: {
+    forecast: {
         display: 'flex',
         justifyContent: 'space-evenly',
         '@media screen and (max-width: 600px)': {
-            flexDirection: 'column'
-        }
+            flexDirection: 'column',
+        },
     },
-    forecastMeasurementsContainer: {
+    forecast__week: {
         '@media screen and (max-width: 600px)': {
             display: 'flex',
             justifyContent: 'space-evenly',
-        }
+        },
     },
-    forecastText: {
-        paddingLeft: '0.5vw',
-        fontSize: '1.5vw',
+    forecast__day: {
+        display: 'flex',
+        paddingBottom: '1vh',
         '@media screen and (max-width: 600px)': {
-            fontSize: '1.5vh'
-        }
+            justifyContent: 'center',
+            width: '20vw',
+        },
     },
-    forecastDateText: {
+    forecast__date: {
         display: 'flex',
         justifyContent: 'center',
         color: 'yellow',
@@ -70,83 +77,110 @@ const useStyles = makeStyles({
         '@media screen and (max-width: 600px)': {
             fontSize: '1.5vh',
             width: '20vw',
-        }
+        },
     },
-    forecastIconSize: {
+    forecast__text: {
+        paddingLeft: '0.5vw',
+        fontSize: '1.5vw',
+        '@media screen and (max-width: 600px)': {
+            fontSize: '1.5vh',
+        },
+    },
+    forecast__icon: {
         width: '2vw',
         '@media screen and (max-width: 600px)': {
-            width: '2.5vh'
-        }
+            width: '2.5vh',
+        },
     },
-    forecastDay: {
+    info__text: {
+        fontSize: '3vw',
+        color: 'yellow',
+        textAlign: 'center',
+    },
+    loader: {
         display: 'flex',
-        paddingBottom: '1vh',
-        '@media screen and (max-width: 600px)': {
-            justifyContent: 'center',
-            width: '20vw',
-        }
-    }
+        justifyContent: 'center',
+        height: '50vh',
+        alignItems: 'center',
+    },
 });
 
 const timestampToDate = (unixTimestamp, version) => {
-    const milliseconds = unixTimestamp * 1000
-    const dateObject = new Date(milliseconds)
-    if (version === 'short')
-        return dateObject.toLocaleString('pl-PL', { day: 'numeric', month: 'numeric' })
-    else
-        return dateObject.toLocaleString('pl-PL')
+    const milliseconds = unixTimestamp * 1000;
+    const dateObject = new Date(milliseconds);
+    if (version === 'short') {
+        return dateObject.toLocaleString('pl-PL', { day: 'numeric', month: 'numeric' });
+    }
+    else {
+        return dateObject.toLocaleString('pl-PL');
+    }
 }
 
 const WeatherData = (props) => {
 
-    const classes = useStyles()
+    const classes = useStyles();
 
-    let lat = props.coords[0].lat
-    let lng = props.coords[0].lng
-    const key = `4c5fbd2fe1afe8b0cd155b79c2de7ef8`
-    const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&units=metric&appid=${key}`
+    let lat = props.coords[0].lat;
+    let lng = props.coords[0].lng;
+    const key = `4c5fbd2fe1afe8b0cd155b79c2de7ef8`;
 
     if (lng > 180) {
-        lng = lng % 180
+        if (lng % 180 !== lng % 360) {
+            lng = (lng % 180) - 180;
+        }
+        if (lng % 180 === lng % 360) {
+            lng = lng % 180;
+        }
     }
     if (lng < -180) {
-        lng = 180 + (lng % 180)
+        if (lng % 180 !== lng % 360) {
+            lng = (lng % 180) + 180;
+        }
+        if (lng % 180 === lng % 360) {
+            lng = lng % 180;
+        }
     }
 
-    const [data, setData] = useState(null)
+    const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&units=metric&appid=${key}`;
+
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         (async () => {
-            if (lat && lng) {
+            if (lat && lng > -180 && lng < 180) {
+                setData(null);
+                setLoading(true);
                 const response = await axios.get(url);
-                setData(response.data)
+                setLoading(false);
+                setData(response.data);
             }
         })();
     }, [lat, lng, url]);
 
-    const forecast = []
+    const forecast = [];
     if (data) {
         for (let i = 1; i < data.daily.length; i++) {
             forecast.push(
-                <div className={classes.forecastMeasurementsContainer} key={i}>
-                    <div className={classes.forecastDay}>
-                        <img className={classes.forecastIconSize} alt={`weather icon`} src={`http://openweathermap.org/img/w/${data.daily[i].weather[0].icon}.png`} />
-                        <div className={classes.forecastText}>{data.daily[i].temp.day}&#8451;</div>
+                <div className={classes.forecast__week} key={i}>
+                    <div className={classes.forecast__day}>
+                        <img className={classes.forecast__icon} alt={`weather icon`} src={`http://openweathermap.org/img/w/${data.daily[i].weather[0].icon}.png`} />
+                        <span className={classes.forecast__text}>{data.daily[i].temp.day}&#8451;</span>
                     </div>
-                    <div className={classes.forecastDay}>
-                        <img className={classes.forecastIconSize} alt={`pressure icon`} src={pressureIcon} />
-                        <span className={classes.forecastText}>{data.daily[i].pressure} hPa</span>
+                    <div className={classes.forecast__day}>
+                        <img className={classes.forecast__icon} alt={`pressure icon`} src={pressureIcon} />
+                        <span className={classes.forecast__text}>{data.daily[i].pressure} hPa</span>
                     </div>
-                    <div className={classes.forecastDay}>
-                        <img className={classes.forecastIconSize} alt={`humidity icon`} src={humidityIcon} />
-                        <span className={classes.forecastText}>{data.daily[i].humidity}%</span>
+                    <div className={classes.forecast__day}>
+                        <img className={classes.forecast__icon} alt={`humidity icon`} src={humidityIcon} />
+                        <span className={classes.forecast__text}>{data.daily[i].humidity}%</span>
                     </div>
-                    <div className={classes.forecastDay}>
-                        <img className={classes.forecastIconSize} alt={`wind speed icon`} src={windIcon} />
-                        <span className={classes.forecastText}>{data.daily[i].wind_speed} m/s</span>
+                    <div className={classes.forecast__day}>
+                        <img className={classes.forecast__icon} alt={`wind speed icon`} src={windIcon} />
+                        <span className={classes.forecast__text}>{data.daily[i].wind_speed} m/s</span>
                     </div>
                     <div>
-                        <div className={classes.forecastDateText}>{timestampToDate(data.daily[i].dt, 'short')}</div>
+                        <div className={classes.forecast__date}>{timestampToDate(data.daily[i].dt, 'short')}</div>
                     </div>
                 </div>)
         }
@@ -154,39 +188,44 @@ const WeatherData = (props) => {
 
     return (
         <div>
+            {!data && !loading && (
+                <div className={classes.info__text}>Mark a place on the map to check the weather</div>
+            )}
+            {loading && (
+                <div className={classes.loader}><CircularProgress color={'inherit'} size={'10vh'} /></div>
+            )}
             {data &&
-                (<div className={classes.mainContainer}>
-                    <div>
-                        <div className={classes.currentDateText}>
+                (<div className={classes.weatherContainer}>
+                    <div className={classes.current}>
+                        <div className={classes.current__date}>
                             <span>{timestampToDate(data.current.dt)}</span>
                         </div>
-                        <div className={classes.currentMeasurementsContainer}>
-                            <div className={classes.currentMeasurementContainer}>
-                                <img className={classes.currentIconSize} alt={`weather icon`} src={`http://openweathermap.org/img/w/${data.current.weather[0].icon}.png`} />
-                                <span className={classes.currentMeasurementText}>{data.current.temp}&#8451;</span>
+                        <div className={classes.current__measurements}>
+                            <div className={classes.current__measurement}>
+                                <img className={classes.current__icon} alt={`weather icon`} src={`http://openweathermap.org/img/w/${data.current.weather[0].icon}.png`} />
+                                <span className={classes.current__text}>{data.current.temp}&#8451;</span>
                             </div>
-                            <div className={classes.currentMeasurementContainer}>
-                                <img className={classes.currentIconSize} alt={`pressure icon`} src={pressureIcon} />
-                                <span className={classes.currentMeasurementText}>{data.current.pressure} hPa</span>
+                            <div className={classes.current__measurement}>
+                                <img className={classes.current__icon} alt={`pressure icon`} src={pressureIcon} />
+                                <span className={classes.current__text}>{data.current.pressure} hPa</span>
                             </div>
-                            <div className={classes.currentMeasurementContainer}>
-                                <img className={classes.currentIconSize} alt={`humidity icon`} src={humidityIcon} />
-                                <span className={classes.currentMeasurementText}>{data.current.humidity}%</span>
+                            <div className={classes.current__measurement}>
+                                <img className={classes.current__icon} alt={`humidity icon`} src={humidityIcon} />
+                                <span className={classes.current__text}>{data.current.humidity}%</span>
                             </div>
-                            <div className={classes.currentMeasurementContainer}>
-                                <img className={classes.currentIconSize} alt={`wind speed icon`} src={windIcon} />
-                                <span className={classes.currentMeasurementText}>{data.current.wind_speed} m/s</span>
+                            <div className={classes.current__measurement}>
+                                <img className={classes.current__icon} alt={`wind speed icon`} src={windIcon} />
+                                <span className={classes.current__text}>{data.current.wind_speed} m/s</span>
                             </div>
                         </div>
                     </div>
-                    <div className={classes.forecastContainer}>
+                    <div className={classes.forecast}>
                         {forecast}
                     </div>
-                </div>
-                )
+                </div>)
             }
         </div>
     );
 }
 
-export default WeatherData
+export default WeatherData;
