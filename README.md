@@ -1,4 +1,4 @@
-## Weather App
+## Weather App - https://mkarzel.github.io/weather-app/
 
 This app allows you to check current weather and one week forecast for every place in the world. Mark a place on the map to get weather info.
 
