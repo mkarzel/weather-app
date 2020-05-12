@@ -149,11 +149,16 @@ const WeatherData = (props) => {
     useEffect(() => {
         (async () => {
             if (lat && lng > -180 && lng < 180) {
-                setData(null);
-                setLoading(true);
-                const response = await axios.get(url);
-                setLoading(false);
-                setData(response.data);
+                try {
+                    setData(null);
+                    setLoading(true);
+                    const response = await axios.get(url);
+                    setLoading(false);
+                    setData(response.data);
+                } catch (e) {
+                    setLoading(false);
+                    console.error(e);
+                }
             }
         })();
     }, [lat, lng, url]);
