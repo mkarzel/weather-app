@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import pressureIcon from '../images/atmospheric-pressure.png';
-import humidityIcon from '../images/humidity.png';
-import windIcon from '../images/wind-speed.png';
+import pressureIcon from '../icons/pressure.png';
+import humidityIcon from '../icons/humidity.png';
+import windIcon from '../icons/wind-speed.png';
 import { makeStyles } from '@material-ui/styles';
 import { CircularProgress } from '@material-ui/core';
 import weatherIcons from '../descriptions.json';
