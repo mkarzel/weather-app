@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import pressureIcon from '../icons/pressure.png';
-import humidityIcon from '../icons/humidity.png';
-import windIcon from '../icons/wind-speed.png';
 import { makeStyles } from '@material-ui/styles';
 import { CircularProgress } from '@material-ui/core';
 import weatherIcons from '../descriptions.json';
@@ -189,15 +186,15 @@ const WeatherData = (props) => {
                         <span className={classes.forecast__text}>{data.daily.temperature_2m_max[i]}&#8451;</span>
                     </div>
                     <div className={classes.forecast__day}>
-                        <img className={classes.forecast__icon} alt={`pressure icon`} src={pressureIcon} />
+                        <img className={classes.forecast__icon} alt={`pressure icon`} src='/images/atmospheric-pressure.png' />
                         <span className={classes.forecast__text}>{data.daily.pressure_msl_mean[i]} hPa</span>
                     </div>
                     <div className={classes.forecast__day}>
-                        <img className={classes.forecast__icon} alt={`humidity icon`} src={humidityIcon} />
+                        <img className={classes.forecast__icon} alt={`humidity icon`} src='/images/humidity.png' />
                         <span className={classes.forecast__text}>{data.daily.precipitation_sum[i]} mm</span>
                     </div>
                     <div className={classes.forecast__day}>
-                        <img className={classes.forecast__icon} alt={`wind speed icon`} src={windIcon} />
+                        <img className={classes.forecast__icon} alt={`wind speed icon`} src='/images/wind-speed.png' />
                         <span className={classes.forecast__text}>{data.daily.wind_speed_10m_max[i]} km/h</span>
                     </div>
                     <div>
@@ -227,11 +224,11 @@ const WeatherData = (props) => {
                                 <span className={classes.current__text}>{data.current.temperature_2m}&#8451;</span>
                             </div>
                             <div className={classes.current__measurement}>
-                                <img className={classes.current__icon} alt={`wind speed icon`} src={windIcon} />
+                                <img className={classes.current__icon} alt={`wind speed icon`} src='/images/wind-speed.png' />
                                 <span className={classes.current__text}>{data.current.wind_speed_10m} m/s</span>
                             </div>
                             <div className={classes.current__measurement}>
-                                <img className={classes.current__icon} alt={`pressure icon`} src={pressureIcon} />
+                                <img className={classes.current__icon} alt={`pressure icon`} src='/images/atmospheric-pressure.png' />
                                 <span className={classes.current__text}>{data.current.pressure_msl} hPa</span>
                             </div>
                             {/* <div className={classes.current__measurement}>
