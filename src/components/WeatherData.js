@@ -5,6 +5,7 @@ import humidityIcon from '../images/humidity.png';
 import windIcon from '../images/wind-speed.png';
 import { makeStyles } from '@material-ui/styles';
 import { CircularProgress } from '@material-ui/core';
+import weatherIcons from '../descriptions.json';
 
 const useStyles = makeStyles({
     weatherContainer: {
@@ -140,9 +141,7 @@ const WeatherData = (props) => {
         }
     }
 
-    //const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=weather_code,temperature_2m_max,wind_speed_10m_max,showers_sum,relative_humidity_2m_mean&current=temperature_2m,wind_speed_10m,precipitation,weather_code,relative_humidity_2m,pressure_msl&timeformat=unixtime`
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=weather_code,temperature_2m_max,wind_speed_10m_max,relative_humidity_2m_mean,precipitation_sum,pressure_msl_mean&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m,relative_humidity_2m,pressure_msl&current=temperature_2m,wind_speed_10m,weather_code,pressure_msl&timezone=Europe%2FBerlin&timeformat=unixtime`
-
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=weather_code,temperature_2m_max,wind_speed_10m_max,relative_humidity_2m_mean,precipitation_sum,pressure_msl_mean&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m,relative_humidity_2m,pressure_msl&current=temperature_2m,wind_speed_10m,weather_code,pressure_msl,is_day&timezone=Europe%2FBerlin&timeformat=unixtime`
 
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -164,33 +163,49 @@ const WeatherData = (props) => {
         })();
     }, [lat, lng, url]);
 
+    const WeatherIcon = ({ code, timeOfDay }) => {
+        const weatherInfo = weatherIcons[code]?.[timeOfDay];
+
+        if (!weatherInfo) return <p>No weather data</p>;
+
+        return (
+            <div>
+                <img
+                    className="weather-icon"
+                    src={weatherInfo.image}
+                    alt={weatherInfo.description}
+                />
+            </div>
+        );
+    };
+
     const forecast = [];
-    // if (data) {
-    //     for (let i = 1; i < data.daily.length; i++) {
-    //         forecast.push(
-    //             <div className={classes.forecast__week} key={i}>
-    //                 <div className={classes.forecast__day}>
-    //                     <img className={classes.forecast__icon} alt={`weather icon`} src={`http://openweathermap.org/img/w/${data.daily[i].weather[0].icon}.png`} />
-    //                     <span className={classes.forecast__text}>{data.daily[i].temperature_2m_max}&#8451;</span>
-    //                 </div>
-    //                 <div className={classes.forecast__day}>
-    //                     <img className={classes.forecast__icon} alt={`pressure icon`} src={pressureIcon} />
-    //                     <span className={classes.forecast__text}>{data.daily[i].pressure} hPa</span>
-    //                 </div>
-    //                 <div className={classes.forecast__day}>
-    //                     <img className={classes.forecast__icon} alt={`humidity icon`} src={humidityIcon} />
-    //                     <span className={classes.forecast__text}>{data.daily[i].showers_sum}%</span>
-    //                 </div>
-    //                 <div className={classes.forecast__day}>
-    //                     <img className={classes.forecast__icon} alt={`wind speed icon`} src={windIcon} />
-    //                     <span className={classes.forecast__text}>{data.daily[i].wind_speed_10m_max} km/h</span>
-    //                 </div>
-    //                 <div>
-    //                     <div className={classes.forecast__date}>{timestampToDate(data.daily[i].dt, 'short')}</div>
-    //                 </div>
-    //             </div>)
-    //     }
-    // }
+    if (data) {
+        for (let i = 1; i < data.daily.time.length; i++) {
+            forecast.push(
+                <div className={classes.forecast__week} key={i}>
+                    <div className={classes.forecast__day}>
+                        <WeatherIcon code={data.daily.weather_code[i]} timeOfDay='1' />
+                        <span className={classes.forecast__text}>{data.daily.temperature_2m_max[i]}&#8451;</span>
+                    </div>
+                    <div className={classes.forecast__day}>
+                        <img className={classes.forecast__icon} alt={`pressure icon`} src={pressureIcon} />
+                        <span className={classes.forecast__text}>{data.daily.pressure_msl_mean[i]} hPa</span>
+                    </div>
+                    <div className={classes.forecast__day}>
+                        <img className={classes.forecast__icon} alt={`humidity icon`} src={humidityIcon} />
+                        <span className={classes.forecast__text}>{data.daily.precipitation_sum[i]} mm</span>
+                    </div>
+                    <div className={classes.forecast__day}>
+                        <img className={classes.forecast__icon} alt={`wind speed icon`} src={windIcon} />
+                        <span className={classes.forecast__text}>{data.daily.wind_speed_10m_max[i]} km/h</span>
+                    </div>
+                    <div>
+                        <div className={classes.forecast__date}>{timestampToDate(data.daily.time[i], 'short')}</div>
+                    </div>
+                </div>)
+        }
+    }
 
     return (
         <div>
@@ -208,12 +223,8 @@ const WeatherData = (props) => {
                         </div>
                         <div className={classes.current__measurements}>
                             <div className={classes.current__measurement}>
-                                <img className={classes.current__icon} alt={`weather icon`} src={pressureIcon} /> 
+                                <WeatherIcon code={data.current.weather_code} timeOfDay={data.current.is_day} />
                                 <span className={classes.current__text}>{data.current.temperature_2m}&#8451;</span>
-                            </div>
-                            <div className={classes.current__measurement}>
-                                <img className={classes.current__icon} alt={`precipitation icon`} src={humidityIcon} />
-                                <span className={classes.current__text}>{data.current.precipitation}mm</span>
                             </div>
                             <div className={classes.current__measurement}>
                                 <img className={classes.current__icon} alt={`wind speed icon`} src={windIcon} />
@@ -223,10 +234,10 @@ const WeatherData = (props) => {
                                 <img className={classes.current__icon} alt={`pressure icon`} src={pressureIcon} />
                                 <span className={classes.current__text}>{data.current.pressure_msl} hPa</span>
                             </div>
-                            <div className={classes.current__measurement}>
+                            {/* <div className={classes.current__measurement}>
                                 <img className={classes.current__icon} alt={`humidity icon`} src={humidityIcon} />
                                 <span className={classes.current__text}>{data.current.relative_humidity_2m}%</span>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                     <div className={classes.forecast}>
