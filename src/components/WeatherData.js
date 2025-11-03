@@ -80,6 +80,8 @@ const useStyles = makeStyles({
     forecast__text: {
         paddingLeft: '0.5vw',
         fontSize: '1.5vw',
+        display: 'flex',
+        alignItems: 'center',
         '@media screen and (max-width: 600px)': {
             fontSize: '1.5vh',
         },
@@ -182,7 +184,7 @@ const WeatherData = (props) => {
             forecast.push(
                 <div className={classes.forecast__week} key={i}>
                     <div className={classes.forecast__day}>
-                        <WeatherIcon code={data.daily.weather_code[i]} timeOfDay='1' />
+                        <WeatherIcon className={classes.forecast__icon} code={data.daily.weather_code[i]} timeOfDay='1' />
                         <span className={classes.forecast__text}>{data.daily.temperature_2m_max[i]}&#8451;</span>
                     </div>
                     <div className={classes.forecast__day}>
@@ -220,7 +222,7 @@ const WeatherData = (props) => {
                         </div>
                         <div className={classes.current__measurements}>
                             <div className={classes.current__measurement}>
-                                <WeatherIcon code={data.current.weather_code} timeOfDay={data.current.is_day} />
+                                <WeatherIcon className={classes.current__icon} code={data.current.weather_code} timeOfDay={data.current.is_day} />
                                 <span className={classes.current__text}>{data.current.temperature_2m}&#8451;</span>
                             </div>
                             <div className={classes.current__measurement}>
